@@ -19,7 +19,7 @@ env:
   # Module Display Name
   MODULE_DISPLAY_NAME: "Fluid Combat Next"
   # Game Directory for build
-  BANNERLORD_GAME_DIR: "/bannerlord"
+  BANNERLORD_GAME_DIR: "./bannerlord"
 
 jobs:
   build-module:
