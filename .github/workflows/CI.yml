@@ -1,4 +1,4 @@
-name: TestBuild
+name: CI
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Build Module for testing
+    - name: Build Module
       run: |    
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
 
@@ -51,8 +51,7 @@ jobs:
         For ($i = 0; $i -le $gameversions.Length - 1; $i++)
         {
             $gameversion = $gameversions[$i];
-            $version = $gameversion.substring(1);
-            $constgameversion = $gameversion.replace(".", "");
+            $gameversion = $gameversion.replace("v", "")            
 
             echo "::group::Build for $gameversion"
             echo "Start building for gameversion = $gameversion"

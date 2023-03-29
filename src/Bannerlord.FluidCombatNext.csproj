@@ -10,14 +10,7 @@
         <ModuleName>$(MSBuildProjectName)</ModuleName>
         <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
         <GameVersion>1.1.2</GameVersion>
-    </PropertyGroup>
-
-    <!-- STABLE, BETA, and e.g., e157 / e158 Constants Defined in Code -->
-    <PropertyGroup>
-        <GameVersionFlat>$([System.String]::Copy('$(GameVersion)').Replace('.',''))</GameVersionFlat>
-        <GameVersionConstant>v$(GameVersionFlat)</GameVersionConstant>
-        <DefineConstants>$(DefineConstants);$(GameVersionConstant)</DefineConstants>
-    </PropertyGroup>
+    </PropertyGroup> 
 
     <PropertyGroup Condition="$(TargetFramework) == 'net472' AND $(OS) == 'Windows_NT'">
         <IsLocal>True</IsLocal>
