@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   # Disable the .NET logo in the console output.
@@ -36,61 +37,67 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Build Module
-      run: |
-        $impl = $PWD.Path + '/bannerlord-implementations';
-        $path = $PWD.Path + '/bannerlord';
-
-        $final = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/';
-        $proj = 'src/${{ env.MODULE_NAMESPACE }}.csproj';
-
-        $pdll = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.dll';
-        $ppdb = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.pdb';
-
-        # The folders are required to be created before executing the script
-        New-Item -ItemType directory -Force -Path $impl;
-        New-Item -ItemType directory -Force -Path $path;
+      run: |        
+        $path = $PWD.Path + '/bannerlord';     
 
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
+
+        $proj = 'src/${{ env.MODULE_NAMESPACE }}.csproj';
+        $path = $PWD.Path + '/bannerlord';
 
         # Process all implementations
         For ($i = 0; $i -le $gameversions.Length - 1; $i++)
         {
+            if ($i -eq 0)
+            {
+                $output = "final"
+            }
+            else
+            {
+                "output/$gameversion"
+            }
+
             $gameversion = $gameversions[$i];
             $version = $gameversion.substring(1);
             $constgameversion = $gameversion.replace(".", "");
             echo "::group::Build for $gameversion"
             echo "Start building for gameversion = $gameversion"
             dotnet clean $proj --configuration Release;
-            dotnet build $proj --configuration Release -p:GameVersion=$gameversion -p:GameFolder="$path"";
-            # Copy Implementations to the Implementations folder
-            Copy-Item $pdll $impl/;
-            Copy-Item $ppdb $impl/;
+
+            dotnet build $proj --configuration Release -p:GameVersion=$gameversion -p:GameFolder="$path" --output "output/$gameversion";
+            
             echo "::endgroup::"
         }
-        # Copy Implementations to the Module
-        Copy-Item $impl/* $final;
-        # Delete Implementations folder
-        Remove-Item -Recurse $impl;
+
+        # Copy last version for publish
       shell: pwsh
 
     - name: Install and Run ChangelogParser
       id: changelog
       run: |
         dotnet tool install -g Bannerlord.ChangelogParser
+
+        # Parse Latest version
         vers="$(bannerlord_changelog_parser latestversion -f "$PWD/changelog.txt")"
+
+        #Set output variable for latest version
         echo "::set-output name=mod_version::$vers"
+
+        # Parse Description
         desc="$(bannerlord_changelog_parser fulldescription -f "$PWD/changelog.txt")"
         desc="${desc//'%'/'%25'}"
         desc="${desc//$'"'/'%22'}"
         desc="${desc//$'\n'/'%0A'}"
         desc="${desc//$'\r'/'%0D'}"
+
+        #Set output variable for description
         echo "::set-output name=mod_description::$desc"
 
     - name: Upload bannerlord folder
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.MODULE_NAMESPACE }}
-        path: ./bannerlord/
+        path: ./final/
 
 ############################
 ##        NEXUSMODS        #
@@ -100,7 +107,7 @@ jobs:
 #    uses: BUTR/workflows/.github/workflows/release-nexusmods.yml@master
 #    with:
 #      nexusmods_game_id: mountandblade2bannerlord
-#      nexusmods_mod_id: 832
+#      nexusmods_mod_id: 9999
 #      mod_filename: ${{ env.MODULE_NAME }}
 #      mod_version: ${{ needs.build-module.outputs.mod_version }}
 #      mod_description: ${{ needs.build-module.outputs.mod_description }}
@@ -112,27 +119,27 @@ jobs:
 ###########################
 #          STEAM          #
 ###########################
-  publish-on-steam:
-    needs: ["build-module"]
-    uses: BUTR/workflows/.github/workflows/release-steam.yml@master
-    with:
-      workshop_id: 2881380744
-      mod_id: ${{ env.MODULE_NAMESPACE }}
-      mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: ${{ env.MODULE_NAMESPACE }}
-    secrets:
-      STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
-      STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
-      STEAM_AUTH_CODE: ${{ secrets.STEAM_WORKSHOP_AUTH_CODE }}
+  #publish-on-steam:
+  #  needs: ["build-module"]
+  #  uses: BUTR/workflows/.github/workflows/release-steam.yml@master
+  #  with:
+  #    workshop_id: 9999999
+  #    mod_id: ${{ env.MODULE_NAMESPACE }}
+  #    mod_description: ${{ needs.build-module.outputs.mod_description }}
+  #    artifact_name: ${{ env.MODULE_NAMESPACE }}
+  #  secrets:
+  #    STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
+  #    STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
+  #    STEAM_AUTH_CODE: ${{ secrets.STEAM_WORKSHOP_AUTH_CODE }}
 
 ###########################
 #         GITHUB          #
 ###########################
-  publish-on-github:
-    needs: ["build-module"]
-    uses: BUTR/workflows/.github/workflows/release-github.yml@master
-    with:
-      mod_id: ${{ env.MODULE_NAMESPACE }}
-      mod_version: ${{ needs.build-module.outputs.mod_version }}
-      mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: ${{ env.MODULE_NAMESPACE }}
+  #publish-on-github:
+  #  needs: ["build-module"]
+  #  uses: BUTR/workflows/.github/workflows/release-github.yml@master
+  #  with:
+  #    mod_id: ${{ env.MODULE_NAMESPACE }}
+  #    mod_version: ${{ needs.build-module.outputs.mod_version }}
+  #    mod_description: ${{ needs.build-module.outputs.mod_description }}
+  #    artifact_name: ${{ env.MODULE_NAMESPACE }}
