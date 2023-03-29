@@ -39,10 +39,10 @@ jobs:
       run: |
         $impl = $PWD.Path + '/bannerlord-implementations';
         $path = $PWD.Path + '/bannerlord';
-        $final = $path + '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/';
-        $proj = 'src/$MODULE_NAMESPACE/$MODULE_NAMESPACE.csproj';
-        $pdll = $path + '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/$MODULE_NAMESPACE*.dll';
-        $ppdb = $path + '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/$MODULE_NAMESPACE*.pdb';
+        $final = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/';
+        $proj = 'src/${{ env.MODULE_NAMESPACE }}/${{ env.MODULE_NAMESPACE }}.csproj';
+        $pdll = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.dll';
+        $ppdb = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.pdb';
         # The folders are required to be created before executing the script
         New-Item -ItemType directory -Force -Path $impl;
         New-Item -ItemType directory -Force -Path $path;
@@ -84,25 +84,25 @@ jobs:
     - name: Upload bannerlord folder
       uses: actions/upload-artifact@v3
       with:
-        name: $MODULE_NAMESPACE
+        name: ${{ env.MODULE_NAMESPACE }}
         path: ./bannerlord/
 
-###########################
-#        NEXUSMODS        #
-###########################
-  publish-on-nexusmods:
-    needs: ["build-module"]
-    uses: BUTR/workflows/.github/workflows/release-nexusmods.yml@master
-    with:
-      nexusmods_game_id: mountandblade2bannerlord
-      nexusmods_mod_id: 832
-      mod_filename: MODULE_NAME
-      mod_version: ${{ needs.build-module.outputs.mod_version }}
-      mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: $MODULE_NAMESPACE
-    secrets:
-      NEXUSMODS_APIKEY: ${{ secrets.NEXUSMODS_APIKEY }}
-      NEXUSMODS_COOKIES: ${{ secrets.NEXUSMODS_COOKIES }}
+############################
+##        NEXUSMODS        #
+############################
+#  publish-on-nexusmods:
+#    needs: ["build-module"]
+#    uses: BUTR/workflows/.github/workflows/release-nexusmods.yml@master
+#    with:
+#      nexusmods_game_id: mountandblade2bannerlord
+#      nexusmods_mod_id: 832
+#      mod_filename: ${{ env.MODULE_NAME }}
+#      mod_version: ${{ needs.build-module.outputs.mod_version }}
+#      mod_description: ${{ needs.build-module.outputs.mod_description }}
+#      artifact_name: ${{ env.MODULE_NAMESPACE }}
+#    secrets:
+#      NEXUSMODS_APIKEY: ${{ secrets.NEXUSMODS_APIKEY }}
+#      NEXUSMODS_COOKIES: ${{ secrets.NEXUSMODS_COOKIES }}
 
 ###########################
 #          STEAM          #
@@ -112,9 +112,9 @@ jobs:
     uses: BUTR/workflows/.github/workflows/release-steam.yml@master
     with:
       workshop_id: 2881380744
-      mod_id: $MODULE_NAMESPACE
+      mod_id: ${{ env.MODULE_NAMESPACE }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: $MODULE_NAMESPACE
+      artifact_name: ${{ env.MODULE_NAMESPACE }}
     secrets:
       STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
       STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
@@ -127,7 +127,7 @@ jobs:
     needs: ["build-module"]
     uses: BUTR/workflows/.github/workflows/release-github.yml@master
     with:
-      mod_id: $MODULE_NAMESPACE
+      mod_id: ${{ env.MODULE_NAMESPACE }}
       mod_version: ${{ needs.build-module.outputs.mod_version }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: $MODULE_NAMESPACE
+      artifact_name: ${{ env.MODULE_NAMESPACE }}
