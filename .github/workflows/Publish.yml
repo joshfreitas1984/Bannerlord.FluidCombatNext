@@ -78,7 +78,8 @@ jobs:
 
             # Create Version directory
             $versionOutput = "$impl/$gameversion/$moduleOutputPath";
-            $versionBaseDirectory = "$impl/$gameversion/Modules/$namespace"
+            #$versionBaseDirectory = "$impl/$gameversion/Modules/$namespace"
+            $versionBaseDirectory = "$impl/$gameversion"
             New-Item -ItemType directory -Force -Path $versionOutput;
 
             # Bannerlord.BuildResources sets the output to GameFolder property
