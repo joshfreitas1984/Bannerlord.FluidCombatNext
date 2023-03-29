@@ -45,7 +45,7 @@ jobs:
         $proj = "src/$namespace.sln";
 
         # Output Path for build
-        $path = "$PWD.Path$env:MODULE_NAMESPACE";
+        $path = $PWD.Path + "$env:MODULE_NAMESPACE";
         # Folder needs to be created or Bannerlord.BuildResources complains
         New-Item -ItemType directory -Force -Path $path;       
 
@@ -53,7 +53,7 @@ jobs:
         $moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";           
 
         # Directory to store each version"s output
-        $impl = "$PWD.Path/versions";
+        $impl = "./versions";
 
         $latestOutput = "$impl/latest/$moduleOutputPath";
         $oldestOutput = "$impl/oldest/$moduleOutputPath";
