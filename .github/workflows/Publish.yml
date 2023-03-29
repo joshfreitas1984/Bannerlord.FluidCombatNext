@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 env:
   # Disable the .NET logo in the console output.
@@ -58,12 +57,12 @@ jobs:
             }
 
             $gameversion = $gameversions[$i];
-            $version = $gameversion.substring(1);
-            $constgameversion = $gameversion.replace(".", "");
+            $gameversion = $gameversion.replace("v", "")    
+
             echo "::group::Build for $gameversion"
             echo "Start building for gameversion = $gameversion"
-            dotnet clean $proj --configuration Release;
 
+            dotnet clean $proj --configuration Release;
             dotnet build $proj --configuration Release -p:GameVersion=$gameversion -p:GameFolder="$path" --output "output/$gameversion";
             
             echo "::endgroup::"
