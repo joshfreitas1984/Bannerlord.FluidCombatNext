@@ -85,7 +85,7 @@ jobs:
             dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path" --output "$versionOutput";                    
 
             #Copy submodule
-            Copy-Item "src/$namespace/_Module/SubModule.xml" "$versionBaseDirectory";
+            Copy-Item "src/_Module/SubModule.xml" "$versionBaseDirectory";
 
             if ($i -eq 0)
             {
