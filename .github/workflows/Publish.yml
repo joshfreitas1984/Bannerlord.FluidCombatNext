@@ -37,23 +37,24 @@ jobs:
 
     - name: Build Module
       run: |
-        $namespace = "${{ env.MODULE_NAMESPACE }}"
+        $namespace = "$env:MODULE_NAMESPACE"
+
         # Code to build
-        $proj = 'src/$namespace.sln';
+        $proj = "src/$namespace.sln";
 
         # Output Path for build
-        $path = $PWD.Path + '/bannerlord';
+        $path = $PWD.Path + "/bannerlord";
         # Folder needs to be created or Bannerlord.BuildResources complains
         New-Item -ItemType directory -Force -Path $path;       
 
         # Path Required for Module
-        $moduleOutputPath = '/Modules/$namespace/bin/Win64_Shipping_Client/';
+        $moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";
 
         # Files to copy out of build output
-        $outputFiles = $path + '/Modules/$namespace/bin/Win64_Shipping_Client/$namespace*.*';     
+        $outputFiles = "$path/Modules/$namespace/bin/Win64_Shipping_Client/$namespace*.*";     
 
-        # Directory to store each version's output
-        $impl = $PWD.Path + '/versions';
+        # Directory to store each version"s output
+        $impl = "$PWD.Path/versions";
 
         $latestOutput = "$impl/latest/$moduleOutputPath";
         $oldestOutput = "$impl/oldest/$moduleOutputPath";
