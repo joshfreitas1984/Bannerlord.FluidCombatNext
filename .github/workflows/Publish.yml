@@ -45,7 +45,7 @@ jobs:
         $proj = "src/$namespace.sln";
 
         # Output Path for build
-        $path = $PWD.Path + "$env:MODULE_NAMESPACE";
+        $path = "$env:BANNERLORD_GAME_DIR";
         # Folder needs to be created or Bannerlord.BuildResources complains
         New-Item -ItemType directory -Force -Path $path;       
 
@@ -81,14 +81,19 @@ jobs:
 
             if ($i -eq 0)
             {
+                echo "Copying Latest version"
+
                 # Copy Output files to the Implementations folder
                 Copy-Item $versionOutput $latestOutput;
             }
             elseif ($i -eq $gameversions.Length - 1)
             {
+                echo "Copying Oldest version"
+
                 Copy-Item $versionOutput $oldestOutput;
             }
 
+            echo "Build complete"
             echo "::endgroup::"
         }
         
@@ -117,7 +122,7 @@ jobs:
         #echo "::set-output name=mod_description::$desc"
         echo "mod_description=$desc" >> $env:GITHUB_OUTPUT
 
-    - name: Upload bannerlord folder
+    - name: Upload Modules folder
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.MODULE_NAMESPACE }}
@@ -159,11 +164,11 @@ jobs:
 ###########################
 #         GITHUB          #
 ###########################
-  #publish-on-github:
-  #  needs: ["build-module"]
-  #  uses: BUTR/workflows/.github/workflows/release-github.yml@master
-  #  with:
-  #    mod_id: ${{ env.MODULE_NAMESPACE }}
-  #    mod_version: ${{ needs.build-module.outputs.mod_version }}
-  #    mod_description: ${{ needs.build-module.outputs.mod_description }}
-  #    artifact_name: ${{ env.MODULE_NAMESPACE }}
+  publish-on-github:
+    needs: ["build-module"]
+    uses: BUTR/workflows/.github/workflows/release-github.yml@master
+    with:
+      mod_id: ${{ env.MODULE_NAMESPACE }}
+      mod_version: ${{ needs.build-module.outputs.mod_version }}
+      mod_description: ${{ needs.build-module.outputs.mod_description }}
+      artifact_name: ${{ env.MODULE_NAMESPACE }}
