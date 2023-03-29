@@ -78,7 +78,7 @@ jobs:
                 # Copy Output files to the Implementations folder
                 Copy-Item $outputFiles $impl/latest/$moduleOutputPath;
             }
-            else if ($i -eq $gameversions.Length - 1)
+            elseif ($i -eq $gameversions.Length - 1)
             {
                 Copy-Item $outputFiles $impl/oldest/$moduleOutputPath;
             }
