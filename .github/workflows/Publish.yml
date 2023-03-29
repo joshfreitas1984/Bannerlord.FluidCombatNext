@@ -153,7 +153,7 @@ jobs:
     needs: ["build-module"]
     uses: BUTR/workflows/.github/workflows/release-github.yml@master
     with:
-      mod_id: ${{ env.MODULE_NAMESPACE }}
+      mod_id: ${{ needs.build-module.outputs.mod_namespace }}
       mod_version: ${{ needs.build-module.outputs.mod_version }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
       artifact_name: all
@@ -166,9 +166,9 @@ jobs:
     uses: BUTR/workflows/.github/workflows/release-steam.yml@master
     with:
       workshop_id: 2954311115
-      mod_id: ${{ env.MODULE_NAMESPACE }}
+      mod_id: ${{ needs.build-module.outputs.mod_namespace }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
-      artifact_name: ${{ env.MODULE_NAMESPACE }}
+      artifact_name: "latest"
     secrets:
       STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
       STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
