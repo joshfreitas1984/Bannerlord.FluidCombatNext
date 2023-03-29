@@ -44,14 +44,20 @@ jobs:
       run: |
         $impl = $PWD.Path + '/bannerlord-implementations';
         $path = $PWD.Path + '/bannerlord';
+
         $final = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/';
-        $proj = 'src/${{ env.MODULE_NAMESPACE }}/${{ env.MODULE_NAMESPACE }}.csproj';
+
+        $proj = 'src/${{ env.MODULE_NAMESPACE }}.csproj';
+
         $pdll = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.dll';
         $ppdb = $path + '/Modules/${{ env.MODULE_NAMESPACE }}/bin/Win64_Shipping_Client/${{ env.MODULE_NAMESPACE }}*.pdb';
+
         # The folders are required to be created before executing the script
         New-Item -ItemType directory -Force -Path $impl;
         New-Item -ItemType directory -Force -Path $path;
+
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
+
         # Process all implementations
         For ($i = 0; $i -le $gameversions.Length - 1; $i++)
         {
