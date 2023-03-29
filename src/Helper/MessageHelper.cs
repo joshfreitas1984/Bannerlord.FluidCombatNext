@@ -30,5 +30,10 @@ namespace Bannerlord.FluidCombatNext.Helper
             InformationManager.DisplayMessage(new InformationMessage(text, Colors.Green));
             Log.LogInformation(text);
         }
+
+        public static void HandleTrace(string text)
+        {
+            Log.LogTrace(text);
+        }
     }
 }

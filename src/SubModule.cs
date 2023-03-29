@@ -15,17 +15,16 @@ namespace Bannerlord.FluidCombatNext
 {
     public class SubModule : MBSubModuleBase
     {
-        private HotKeyManager? _hotkeyManager;
+        private HotKeyManager? _hotkeyManager = null;
 
         public static readonly string Namespace = typeof(SubModule).Namespace;
         public static readonly string MainHarmonyDomain = $"mod.{Namespace.ToLower()}";
         public const string DisplayName = "Fluid Combat Next";
         public const string ModuleName = "FluidCombatNext"; //Can't have . or spaces
-        public const string HotkeyCategory = "FluidCombat"; //Can't have . or spaces
+        public const string HotkeyCategory = "FluidCombatNext"; //Can't have . or spaces
 
         protected override void OnSubModuleLoad()
-        {
-            //TODO: Replace the logging system because it seems to be badly implemented in ButrLib
+        {            
             AddLogging();
 
             try
@@ -43,6 +42,7 @@ namespace Bannerlord.FluidCombatNext
 
         private void AddLogging()
         {
+            //TODO: Replace the logging system because it seems to be badly implemented in ButrLib
             this.AddSerilogLoggerProvider($"{ModuleName}.txt",
                 new[] { $"{Namespace}.*" },
                 config => config.MinimumLevel.Is(LogEventLevel.Verbose));
@@ -60,10 +60,11 @@ namespace Bannerlord.FluidCombatNext
         {
             base.OnBeforeInitialModuleScreenSetAsRoot();
 
-
             //Register Hotkeys
             if (_hotkeyManager == null)
             {
+                MessageHelper.HandleTrace($"{ModuleName}: Creating Hotkeys");
+
                 _hotkeyManager = HotKeyManager.CreateWithOwnCategory(ModuleName, HotkeyCategory)!;
 
                 _hotkeyManager.Add<FluidAttackKey>();
