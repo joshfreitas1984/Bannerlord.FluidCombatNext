@@ -44,6 +44,9 @@ jobs:
       run: |    
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
 
+        $proj = 'src/${{ env.MODULE_NAMESPACE }}.csproj';
+        $path = ''
+
         # Process all implementations
         For ($i = 0; $i -le $gameversions.Length - 1; $i++)
         {
