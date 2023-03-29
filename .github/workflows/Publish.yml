@@ -38,22 +38,26 @@ jobs:
     - name: Build Module
       run: |
         # Code to build
-        $proj = 'src/${{ env.MODULE_NAMESPACE }}.sln';
+        $proj = 'src/$env:MODULE_NAMESPACE.sln';
 
         # Output Path for build
         $path = $PWD.Path + '/bannerlord';
         # Folder needs to be created or Bannerlord.BuildResources complains
         New-Item -ItemType directory -Force -Path $path;       
 
-        # Temporary directory to store versions
-        $impl = $PWD.Path + '/versions';        
-        New-Item -ItemType directory -Force -Path $impl;
-
         # Path Required for Module
-        $moduleOutputPath = '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/';
+        $moduleOutputPath = '/Modules/$env:MODULE_NAMESPACE/bin/Win64_Shipping_Client/';
 
         # Files to copy out of build output
-        $outputFiles = $path + '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/$MODULE_NAMESPACE*.*';        
+        $outputFiles = $path + '/Modules/$env:MODULE_NAMESPACE/bin/Win64_Shipping_Client/$env:MODULE_NAMESPACE*.*';     
+
+        # Directory to store each version's output
+        $impl = $PWD.Path + '/versions';
+
+        $latestOutput = $impl/latest/$moduleOutputPath;
+        $oldestOutput = $impl/oldest/$moduleOutputPath;
+        New-Item -ItemType directory -Force -Path $latestOutput;
+        New-Item -ItemType directory -Force -Path $oldestOutput;
 
         # Process all implementations - assuming the last version in the file is the most stable
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
@@ -71,16 +75,18 @@ jobs:
             dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path";
 
             # Copy Output files to the Implementations folder
-            Copy-Item $outputFiles $impl/$gameversion/$moduleOutputPath;
+            $versionOuput = $impl/$gameversion/$moduleOutputPath;
+            New-Item -ItemType directory -Force -Path $versionOuput;
+            Copy-Item $outputFiles $versionOuput;
 
             if ($i -eq 0)
             {
                 # Copy Output files to the Implementations folder
-                Copy-Item $outputFiles $impl/latest/$moduleOutputPath;
+                Copy-Item $outputFiles $latestOutput;
             }
             elseif ($i -eq $gameversions.Length - 1)
             {
-                Copy-Item $outputFiles $impl/oldest/$moduleOutputPath;
+                Copy-Item $outputFiles $oldestOutput;
             }
 
             echo "::endgroup::"
