@@ -36,39 +36,56 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Build Module
-      run: |        
-        $path = $PWD.Path + '/bannerlord';     
+      run: |
+        # Code to build
+        $proj = 'src/${{ env.MODULE_NAMESPACE }}.sln';
 
+        # Output Path for build
+        $path = $PWD.Path + '/bannerlord';
+        # Folder needs to be created or Bannerlord.BuildResources complains
+        New-Item -ItemType directory -Force -Path $path;       
+
+        # Temporary directory to store versions
+        $impl = $PWD.Path + '/versions';        
+        New-Item -ItemType directory -Force -Path $impl;
+
+        # Path Required for Module
+        $moduleOutputPath = '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/';
+
+        # Files to copy out of build output
+        $outputFiles = $path + '/Modules/$MODULE_NAMESPACE/bin/Win64_Shipping_Client/$MODULE_NAMESPACE*.*';        
+
+        # Process all implementations - assuming the last version in the file is the most stable
         [string[]]$gameversions = Get-Content -Path supported-game-versions.txt;
 
-        $proj = 'src/${{ env.MODULE_NAMESPACE }}.csproj';
-        $path = $PWD.Path + '/bannerlord';
-
-        # Process all implementations
         For ($i = 0; $i -le $gameversions.Length - 1; $i++)
         {
-            if ($i -eq 0)
-            {
-                $output = "final"
-            }
-            else
-            {
-                "output/$gameversion"
-            }
-
             $gameversion = $gameversions[$i];
             $gameversion = $gameversion.replace("v", "")    
 
             echo "::group::Build for $gameversion"
             echo "Start building for gameversion = $gameversion"
 
+            # Bannerlord.BuildResources sets the output to GameFolder property
             dotnet clean $proj --configuration Release;
-            dotnet build $proj --configuration Release -p:GameVersion=$gameversion -p:GameFolder="$path" --output "output/$gameversion";
-            
+            dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path";
+
+            # Copy Output files to the Implementations folder
+            Copy-Item $outputFiles $impl/$gameversion/$moduleOutputPath;
+
+            if ($i -eq 0)
+            {
+                # Copy Output files to the Implementations folder
+                Copy-Item $outputFiles $impl/latest/$moduleOutputPath;
+            }
+            else if ($i -eq $gameversions.Length - 1)
+            {
+                Copy-Item $outputFiles $impl/oldest/$moduleOutputPath;
+            }
+
             echo "::endgroup::"
         }
-
-        # Copy last version for publish
+        
       shell: pwsh
 
     - name: Install and Run ChangelogParser
@@ -80,7 +97,8 @@ jobs:
         vers="$(bannerlord_changelog_parser latestversion -f "$PWD/changelog.txt")"
 
         #Set output variable for latest version
-        echo "::set-output name=mod_version::$vers"
+        #echo "::set-output name=mod_version::$vers"
+        echo "mod_version=$vers" >> $env:GITHUB_OUTPUT
 
         # Parse Description
         desc="$(bannerlord_changelog_parser fulldescription -f "$PWD/changelog.txt")"
@@ -90,13 +108,14 @@ jobs:
         desc="${desc//$'\r'/'%0D'}"
 
         #Set output variable for description
-        echo "::set-output name=mod_description::$desc"
+        #echo "::set-output name=mod_description::$desc"
+        echo "mod_description=$desc" >> $env:GITHUB_OUTPUT
 
     - name: Upload bannerlord folder
       uses: actions/upload-artifact@v3
       with:
         name: ${{ env.MODULE_NAMESPACE }}
-        path: ./final/
+        path: ./versions/
 
 ############################
 ##        NEXUSMODS        #
