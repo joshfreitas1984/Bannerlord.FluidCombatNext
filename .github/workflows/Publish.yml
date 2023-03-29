@@ -54,7 +54,8 @@ jobs:
         New-Item -ItemType directory -Force -Path $path;       
 
         # Path Required for Module
-        $moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";           
+        #$moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";
+        $moduleOutputPath = "/bin/Win64_Shipping_Client/";           
 
         # Directory to store each version's output
         $impl = "./versions";
@@ -172,7 +173,7 @@ jobs:
     secrets:
       STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
       STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
-      STEAM_AUTH_CODE: ${{ secrets.STEAM_WORKSHOP_AUTH_CODE }}
+      #STEAM_AUTH_CODE: ${{ secrets.STEAM_WORKSHOP_AUTH_CODE }}
 
 ############################
 ##        NEXUSMODS        #
