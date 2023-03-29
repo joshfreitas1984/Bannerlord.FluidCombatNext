@@ -54,8 +54,8 @@ jobs:
         # Directory to store each version's output
         $impl = $PWD.Path + '/versions';
 
-        $latestOutput = $impl/latest/$moduleOutputPath;
-        $oldestOutput = $impl/oldest/$moduleOutputPath;
+        $latestOutput = "$impl/latest/$moduleOutputPath";
+        $oldestOutput = "$impl/oldest/$moduleOutputPath";
         New-Item -ItemType directory -Force -Path $latestOutput;
         New-Item -ItemType directory -Force -Path $oldestOutput;
 
@@ -75,7 +75,7 @@ jobs:
             dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path";
 
             # Copy Output files to the Implementations folder
-            $versionOuput = $impl/$gameversion/$moduleOutputPath;
+            $versionOuput = "$impl/$gameversion/$moduleOutputPath";
             New-Item -ItemType directory -Force -Path $versionOuput;
             Copy-Item $outputFiles $versionOuput;
 
