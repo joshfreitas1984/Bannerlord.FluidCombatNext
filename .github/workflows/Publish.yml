@@ -50,10 +50,7 @@ jobs:
         New-Item -ItemType directory -Force -Path $path;       
 
         # Path Required for Module
-        $moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";
-
-        # Files to copy out of build output
-        $outputFiles = "$path/Modules/$namespace/bin/Win64_Shipping_Client/$namespace*.*";     
+        $moduleOutputPath = "/Modules/$namespace/bin/Win64_Shipping_Client/";           
 
         # Directory to store each version"s output
         $impl = "$PWD.Path/versions";
@@ -74,23 +71,22 @@ jobs:
             echo "::group::Build for $gameversion"
             echo "Start building for gameversion = $gameversion"
 
-            # Bannerlord.BuildResources sets the output to GameFolder property
-            dotnet clean $proj --configuration Release;
-            dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path";
-
-            # Copy Output files to the Implementations folder
+            # Create Version directory
             $versionOutput = "$impl/$gameversion/$moduleOutputPath";
             New-Item -ItemType directory -Force -Path $versionOutput;
-            Copy-Item $outputFiles $versionOutput;
+
+            # Bannerlord.BuildResources sets the output to GameFolder property
+            dotnet clean $proj --configuration Release;
+            dotnet build $proj --configuration Release -p:OverrideGameVersion=$gameversion -p:GameVersion=$gameversion -p:GameFolder="$path" --output "$versionOutput";                    
 
             if ($i -eq 0)
             {
                 # Copy Output files to the Implementations folder
-                Copy-Item $outputFiles $latestOutput;
+                Copy-Item $versionOutput $latestOutput;
             }
             elseif ($i -eq $gameversions.Length - 1)
             {
-                Copy-Item $outputFiles $oldestOutput;
+                Copy-Item $versionOutput $oldestOutput;
             }
 
             echo "::endgroup::"
