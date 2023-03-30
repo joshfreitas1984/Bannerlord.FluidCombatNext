@@ -134,8 +134,7 @@ jobs:
 
         #Set output variable for description
         #echo "::set-output name=mod_description::$desc"
-        echo "mod_description=$desc" >> $env:GITHUB_OUTPUT
-        echo "Desc: $desc"
+        echo "mod_description=$desc" >> $env:GITHUB_OUTPUT        
         
     - name: Upload Modules folder
       uses: actions/upload-artifact@v3
@@ -184,7 +183,11 @@ jobs:
         run: dotnet tool install -g Bannerlord.SteamWorkshop;
         shell: pwsh
       - run: |
-            echo "Desc: $mod_description"
+            echo "mod_id: {{ env.mod_id }}"            
+            echo "Desc: {{ env.mod_description }}"
+
+            echo "mod_id: {{ needs.build-module.outputs.mod_namespace }}"
+            echo "Desc: {{ needs.build-module.outputs.mod_description }}"
 
             bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_WORKSHOP_LOGIN }}" -p "${{ secrets.STEAM_WORKSHOP_PASSWORD }}" -f "${{ env.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ env.mod_description }}";
         shell: pwsh
