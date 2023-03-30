@@ -134,7 +134,7 @@ jobs:
 
         #Set output variable for description
         #echo "::set-output name=mod_description::$desc"
-        echo "mod_description=$desc" >> $env:GITHUB_OUTPUT        
+        echo "mod_description=$desc" >> $env:GITHUB_OUTPUT
         
     - name: Upload Modules folder
       uses: actions/upload-artifact@v3
@@ -165,33 +165,15 @@ jobs:
 ###########################
   publish-on-steam:
     needs: ["build-module"]
-    name: Publish To Steam
-    runs-on: ubuntu-latest
-    env :
+    uses: ./.github/workflows/release-steam.yml
+    with:
       workshop_id: 2954311115
       mod_id: ${{ needs.build-module.outputs.mod_namespace }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
       artifact_name: "latest"
-    steps:
-      - name: Download Module artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.artifact_name }}
-          path: ./artifact
-
-      - name: Install Bannerlord.SteamWorkshop
-        run: dotnet tool install -g Bannerlord.SteamWorkshop;
-        shell: pwsh
-
-      - run: |
-            bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_WORKSHOP_LOGIN }}" -p "${{ secrets.STEAM_WORKSHOP_PASSWORD }}" -f "${{ env.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ env.mod_description }}";
-        
-            echo "mod_id: ${{ env.mod_id }}"            
-            echo "Desc: ${{ env.mod_description }}"
-
-            echo "mod_id: ${{ needs.build-module.outputs.mod_namespace }}"
-            echo "Desc: ${{ needs.build-module.outputs.mod_description }}"            
-        shell: pwsh
+    secrets:
+      STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
+      STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
 
 ############################
 ##        NEXUSMODS        #

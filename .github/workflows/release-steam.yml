@@ -1,0 +1,51 @@
+name: Release Module on Steam
+
+on:
+  workflow_call:
+    inputs:
+      workshop_id:
+        required: true
+        type: number
+        default: -1
+      mod_id:
+        required: true
+        type: string
+      mod_description:
+        required: false
+        type: string
+        default: ''
+      artifact_name:
+        required: true
+        type: string
+    secrets:
+      STEAM_LOGIN:
+        required: true
+      STEAM_PASSWORD:
+        required: true
+
+jobs:
+  publish-on-steam:
+    name: Publish Module on Steam
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Setup
+      uses: butr/actions-common-setup@v2.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Download Module artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ./artifact
+
+    - uses: CyberAndrii/setup-steamcmd@v1
+
+    - name: Install Bannerlord.SteamWorkshop
+      run: dotnet tool install -g Bannerlord.SteamWorkshop;
+      shell: pwsh
+
+    - run: |
+        bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_LOGIN }}" -p "${{ secrets.STEAM_PASSWORD }}" -f "${{ inputs.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ steps.set_description.outputs.mod_description }}";
+      shell: pwsh
