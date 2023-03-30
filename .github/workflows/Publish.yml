@@ -165,16 +165,20 @@ jobs:
 ###########################
   publish-on-steam:
     needs: ["build-module"]
-    uses: BUTR/workflows/.github/workflows/release-steam.yml@master
-    with:
+    name: Publish To Steam
+    runs-on: ubuntu-latest
+    env :
       workshop_id: 2954311115
       mod_id: ${{ needs.build-module.outputs.mod_namespace }}
       mod_description: ${{ needs.build-module.outputs.mod_description }}
       artifact_name: "latest"
-    secrets:
-      STEAM_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
-      STEAM_PASSWORD: ${{ secrets.STEAM_WORKSHOP_PASSWORD }}
-      STEAM_AUTH_CODE: ${{ secrets.STEAM_WORKSHOP_AUTH_CODE }}
+    steps:
+      - name: Install Bannerlord.SteamWorkshop
+        run: dotnet tool install -g Bannerlord.SteamWorkshop;
+        shell: pwsh
+      - run: |
+            bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_WORKSHOP_LOGIN }}" -p "${{ secrets.STEAM_WORKSHOP_PASSWORD }}" -f "${{ env.workshop_id }}" -c "${{ github.workspace }}/artifact/Modules/${{ env.mod_id }}" -d "${{ env.mod_description }}";
+        shell: pwsh
 
 ############################
 ##        NEXUSMODS        #
