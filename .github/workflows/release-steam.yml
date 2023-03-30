@@ -47,5 +47,5 @@ jobs:
       shell: pwsh
 
     - run: |
-        bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_LOGIN }}" -p "${{ secrets.STEAM_PASSWORD }}" -f "${{ inputs.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ steps.set_description.outputs.mod_description }}";
+        bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_LOGIN }}" -p "${{ secrets.STEAM_PASSWORD }}" -f "${{ inputs.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ inputs.mod_description }}";
       shell: pwsh
