@@ -1,5 +1,3 @@
-name: Release Module on Steam
-
 on:
   workflow_call:
     inputs:
@@ -40,6 +38,28 @@ jobs:
         name: ${{ inputs.artifact_name }}
         path: ./artifact
 
+    - name: Install Bannerlord.ChangelogParser
+      if: ${{ inputs.mod_description == '' }}
+      run: dotnet tool install -g Bannerlord.ChangelogParser;
+      shell: pwsh
+
+    - name: Set Description
+      id: set_description
+      run: |
+        if ${{ inputs.mod_description == '' }}
+        then
+          desc="$(bannerlord_changelog_parser fulldescription -f "$PWD/changelog.txt")"
+          desc="${desc//'%'/'%25'}"
+          desc="${desc//$'\n'/'%0A'}"
+          desc="${desc//$'\r'/'%0D'}"
+          echo "::set-output name=mod_description::$desc"
+        else
+          desc="${{ inputs.mod_description }}"
+          desc="${desc//'%'/'%25'}"
+          desc="${desc//$'\n'/'%0A'}"
+          desc="${desc//$'\r'/'%0D'}"
+          echo "::set-output name=mod_description::$desc"
+        fi
     - uses: CyberAndrii/setup-steamcmd@v1
 
     - name: Install Bannerlord.SteamWorkshop
@@ -47,5 +67,5 @@ jobs:
       shell: pwsh
 
     - run: |
-        bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_LOGIN }}" -p "${{ secrets.STEAM_PASSWORD }}" -f "${{ inputs.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ inputs.mod_description }}";
+        bannerlord_steam_workshop loginandpublish -l "${{ secrets.STEAM_LOGIN }}" -p "${{ secrets.STEAM_PASSWORD }}" -f "${{ inputs.workshop_id }}" -c "${{ github.workspace }}/artifact" -d "${{ steps.set_description.outputs.mod_description }}";
       shell: pwsh
