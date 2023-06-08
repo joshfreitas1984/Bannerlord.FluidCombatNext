@@ -8,9 +8,7 @@ Status: k_EItemUpdateStatusPreparingContent 0 / 0
 Status: k_EItemUpdateStatusPreparingContent 0 / 0
 Status: k_EItemUpdateStatusPreparingContent 0 / 0
 Status: k_EItemUpdateStatusPreparingContent 0 / 0
-Status: k_EItemUpdateStatusPreparingContent 0 / 0
-Status: k_EItemUpdateStatusPreparingContent 0 / 0
-Status: k_EItemUpdateStatusPreparingContent 497489 / 497489
+Status: k_EItemUpdateStatusPreparingContent 0 / 497487
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
@@ -21,6 +19,7 @@ Status: k_EItemUpdateStatusUploadingContent 0 / 0
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
 Status: k_EItemUpdateStatusUploadingContent 0 / 0
+Status: k_EItemUpdateStatusUploadingPreviewFile 0 / 0
 Status: k_EItemUpdateStatusUploadingPreviewFile 0 / 0
 Status: k_EItemUpdateStatusUploadingPreviewFile 0 / 0
 Status: k_EItemUpdateStatusCommittingChanges 0 / 0
